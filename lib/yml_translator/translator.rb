@@ -27,14 +27,20 @@ module YMLTranslator
       else
         object
       end
-    rescue RuntimeError
-      return object
     end
 
     def translate_string(string)
+      puts "Translating: #{string}"
       translated = string.translate(to, from: from)
-      puts "Translated: \"#{string}\" to \"#{translated}\""
+      translated.sub!("% {", "%{")
+      puts "Translated: \"#{translated}\""
       translated
+    rescue RuntimeError
+      require 'google_translate'
+      translated = Google::Translator.new.translate(from, to, string)
+      translated = translated[0] if translated
+      puts "Translated: \"#{translated}\""
+      translated.strip
     end
 
     def translate_array(array)

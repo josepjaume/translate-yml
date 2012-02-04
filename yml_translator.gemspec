@@ -25,5 +25,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'fakefs'
 
   s.add_runtime_dependency "to_lang"
+  s.add_runtime_dependency "google-translate"
   s.add_runtime_dependency "slop"
 end
