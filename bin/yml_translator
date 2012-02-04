@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require 'yml_translator'
+
+require 'slop'
+
+opts = Slop.parse do
+  banner "yml_translator yml_file [options]"
+  on :input=
+  on :from=
+  on :to=
+  on :"api-key="
+end
+
+YMLTranslator.config.api_key = opts[:"api-key"]
+
+translated_data = YMLTranslator.translate_file(
+  opts[:input], from: opts[:from], to: opts[:to]
+)
+
+File.open(opts[:output], 'w') do |f|
+  f.write JSON.dump(translated_data)
+end
