@@ -1,4 +1,5 @@
 require 'to_lang'
+require 'google_translate'
 
 module YMLTranslator
   class Translator
@@ -56,14 +57,23 @@ module YMLTranslator
     private :replace_interpolations
 
     def translate_with_fallbacks(string)
+      translate_with_api(string) || translate_scraping(string)
+    end
+
+    def translate_with_api(string)
       translated = string.translate(to, from: from)
       translated.sub!("% {", "%{")
       translated.strip
     rescue RuntimeError
-      require 'google_translate'
+      nil
+    end
+
+    def translate_scraping(string)
       translated = Google::Translator.new.translate(from, to, string)
       translated = translated[0] if translated
       translated.strip
+    rescue RuntimeError
+      nil
     end
 
     def translate_array(array)
