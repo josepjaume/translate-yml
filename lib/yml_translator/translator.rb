@@ -30,16 +30,39 @@ module YMLTranslator
     end
 
     def translate_string(string)
-      puts "Translating: #{string}"
-      translated = string.translate(to, from: from)
-      translated.sub!("% {", "%{")
+      puts "Translating: \"#{string}\""
+      translated = replace_interpolations(string) do |text|
+        translate_with_fallbacks(text)
+      end
       puts "Translated: \"#{translated}\""
       translated
+    end
+
+    def replace_interpolations(text)
+      index = 0
+      replacements = {}
+      text.gsub!(/(%{.*})/) do |string|
+        index += 1
+        replacement = "REPLACEMENT#{index}"
+        replacements[replacement] = string
+        replacement
+      end
+      text = yield(text)
+      replacements.each do |key, value|
+        text.sub!(key, value)
+      end
+      text
+    end
+    private :replace_interpolations
+
+    def translate_with_fallbacks(string)
+      translated = string.translate(to, from: from)
+      translated.sub!("% {", "%{")
+      translated.strip
     rescue RuntimeError
       require 'google_translate'
       translated = Google::Translator.new.translate(from, to, string)
       translated = translated[0] if translated
-      puts "Translated: \"#{translated}\""
       translated.strip
     end
 
