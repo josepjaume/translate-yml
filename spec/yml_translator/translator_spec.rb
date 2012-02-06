@@ -39,9 +39,12 @@ describe YMLTranslator::Translator do
       translated = subject.translate_string(string)
       translated.must_equal "Hola"
     end
+
     it "translates a string with interpolations" do
-      translated = subject.translate_string("Hola, %{name}")
-      puts translated.inspect
+      subject.expects(:translate_string).
+        with("Hi, %{name}").returns("Hola, %{name}")
+      translated = subject.translate_string("Hi, %{name}")
+      translated.must_equal "Hola, %{name}"
     end
   end
 
