@@ -57,14 +57,14 @@ module YMLTranslator
     private :replace_interpolations
 
     def translate_with_fallbacks(string)
-      translate_with_api(string) || translate_scraping(string)
+      translate_with_api(string) || translate_scraping(string) || string
     end
 
     def translate_with_api(string)
       translated = string.translate(to, from: from)
       translated.sub!("% {", "%{")
       translated.strip
-    rescue RuntimeError
+    rescue
       nil
     end
 
@@ -72,7 +72,7 @@ module YMLTranslator
       translated = Google::Translator.new.translate(from, to, string)
       translated = translated[0] if translated
       translated.strip
-    rescue RuntimeError
+    rescue
       nil
     end
 
